@@ -1,43 +1,59 @@
-import {Page} from "@playwright/test";
-
-enum WidgetPageSelectors {
-    WRAPPER = '.sc-dino-typography-h > [class^=widget__]',
-    WIDGET_BODY = '[class^=widgetWrapper] > [class^=widget__]',
-    HEADER_TEXT = 'header h5',
-    BUTTON_OPEN = '[data-test=openWidget]',
-    BUTTON_WRITE_TO_US = '[class^=btn]',
-    ARTICLE_POPULAR_TITLE = '[class^=popularTitle__]',
-    ARTICLE_POPULAR_LIST = `${ARTICLE_POPULAR_TITLE} + ul[class^=articles__]`,
-    ARTICLE_POPULAR_LIST_ITEM = `${ARTICLE_POPULAR_LIST} > li`,
-}
+import {expect, Locator, Page} from "@playwright/test";
 
 export class WidgetPage {
-    static selector = WidgetPageSelectors;
+    private readonly cookieWrapper: Locator;
+    private readonly cookieButton: Locator;
+    private readonly widgetWrapper: Locator;
+    private readonly widgetOpenButton: Locator;
+    private readonly widgetBody: Locator;
+    private readonly popularArticleItem: Locator;
+    private readonly writeToUsButton: Locator;
+    private readonly widgetCloseButton: Locator;
 
-    constructor(protected page: Page) {}
+    constructor(protected page: Page) {
+        this.cookieWrapper = page.locator('._UCHI_COOKIE__wrap:not(._UCHI_COOKIE__wrap--fake)');
+        this.cookieButton = this.cookieWrapper.locator('._UCHI_COOKIE__button');
+        this.widgetWrapper = page.locator('[class^=widgetWrapper]:has(> [class^=widget__])');
+        this.widgetOpenButton = page.getByTestId('openWidget');
+        this.widgetBody = page.locator('[class^=widgetWrapper] > [class^=widget__]');
+        this.popularArticleItem = page.getByTestId('article-list-item');
+        this.writeToUsButton = page.getByTestId('button_feedback_form');
+        this.widgetCloseButton = page.getByRole("button").and(page.locator('[class^=closeBtn]'));
+    }
 
-    wrapper() {
-        return this.page.locator(WidgetPage.selector.WRAPPER)
+    async goto() {
+        await this.page.goto('/');
+    }
+
+    async closeCookiesPopup() {
+        await this.cookieButton.click();
     }
 
     async openWidget() {
-        return this.wrapper().locator(WidgetPage.selector.BUTTON_OPEN).click();
+        await this.widgetOpenButton.click();
     }
 
-    async getPopularArticles() {
-        return this.wrapper().locator(WidgetPage.selector.ARTICLE_POPULAR_LIST_ITEM).all()
+    async closeWidget() {
+        await this.widgetCloseButton.click();
+    }
+
+    async checkWidgetIsVisible() {
+        await expect(this.widgetBody).toBeVisible();
+    }
+
+    async checkWidgetIsNotVisible() {
+        await expect(this.widgetBody).not.toBeVisible();
+    }
+
+    async clickFirstPopularArticle() {
+        await this.popularArticleItem.first().click();
     }
 
     async clickWriteToUs() {
-        return this.wrapper().locator(WidgetPage.selector.BUTTON_WRITE_TO_US).click();
+        await this.writeToUsButton.click();
     }
 
-    async getTitle() {
-        return this.wrapper().locator(WidgetPage.selector.HEADER_TEXT).textContent();
-    }
-
-    getWidgetBody() {
-        return this.page.locator(WidgetPage.selector.WIDGET_BODY);
+    async checkHeaderIsVisible(title: string) {
+        await expect(this.widgetWrapper.getByRole('heading', {name: title, exact: true})).toBeVisible();
     }
 }
-
