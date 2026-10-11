@@ -1,34 +1,47 @@
-import { test, expect } from '@playwright/test';
+import {test} from '@playwright/test';
 import {WidgetPage} from "./widget.page";
 
-test.describe('Uchi.ru widget ', () => {
-  let widgetPage: WidgetPage;
+test.describe('Uchi.ru - Виджет базы знаний', () => {
+    let widgetPage: WidgetPage;
 
-  test.beforeEach(async ({page}) => {
-    widgetPage = new WidgetPage(page);
+    test.beforeEach(async ({page}) => {
+        widgetPage = new WidgetPage(page);
 
-    // open uchi.ru main page
-    await page.goto('/');
+        await test.step('Открываем Главную страницу', async () => {
+            await widgetPage.goto();
+        });
 
-    // close cookies popup
-    await page.click('._UCHI_COOKIE__button');
-  });
+        await test.step('Скрываем попап с куками', async () => {
+            await widgetPage.closeCookiesPopup();
+        });
+    });
 
-  test('opens', async ({page}) => {
-    await widgetPage.openWidget();
+    test('Открытие виджета', async () => {
+        await test.step('Кликаем на кнопку открытия виджета', async () => {
+            await widgetPage.openWidget();
+        });
 
-    await expect(widgetPage.getWidgetBody()).toBeVisible()
-  });
+        await test.step('Проверяем, что виджет отображается', async () => {
+            await widgetPage.checkWidgetIsVisible();
+        });
+    });
 
-  test('has correct title', async ({ page }) => {
-    await widgetPage.openWidget();
+    test('Корректный заголовок на форме обращения в Поддержку', async () => {
+        await test.step('Кликаем на кнопку открытия виджета', async () => {
+            await widgetPage.openWidget();
+        });
 
-    const articles = await widgetPage.getPopularArticles();
+        await test.step('Кликаем на первую популярную статью', async () => {
+            await widgetPage.clickFirstPopularArticle();
+        });
 
-    await articles[0].click();
+        await test.step('Кликаем на кнопку "Написать нам"', async () => {
+            await widgetPage.clickWriteToUs();
+        });
 
-    await widgetPage.clickWriteToUs();
-
-    expect(await widgetPage.getTitle()).toEqual('Связь с поддержкой');
-  });
-});
+        const expectedTitle = 'Связь с поддержкой';
+        await test.step(`Проверяем, что форма имеет заголовок "${expectedTitle}"`, async () => {
+            await widgetPage.checkHeaderIsVisible(expectedTitle);
+        });
+    });
+})
