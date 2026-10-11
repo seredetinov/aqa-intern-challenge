@@ -4,7 +4,15 @@ import {WidgetPage} from "./widget.page";
 test.describe('Uchi.ru - Виджет базы знаний', () => {
     let widgetPage: WidgetPage;
 
-    test.beforeEach(async ({page}) => {
+    test.beforeEach(async ({context, page}) => {
+        await test.step('Входим в АБ с поддержкой виджета', async () => {
+            await context.addCookies([{
+                name: 'ab_mainpage_redesign',
+                value: 'a',
+                url: 'https://uchi.ru',
+            }]);
+        });
+
         widgetPage = new WidgetPage(page);
 
         await test.step('Открываем Главную страницу', async () => {
