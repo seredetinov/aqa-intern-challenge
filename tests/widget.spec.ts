@@ -44,4 +44,22 @@ test.describe('Uchi.ru - Виджет базы знаний', () => {
             await widgetPage.checkHeaderIsVisible(expectedTitle);
         });
     });
+
+    test('Закрытие виджета', async () => {
+        await test.step('Кликаем на кнопку открытия виджета', async () => {
+            await widgetPage.openWidget();
+        });
+
+        await test.step('Проверяем, что виджет отображается', async () => {
+            await widgetPage.checkWidgetIsVisible();
+        });
+
+        await test.step('Кликаем на кнопку закрытия виджета', async () => {
+            await widgetPage.closeWidget();
+        });
+
+        await test.step('Проверяем, что виджет не отображается', async () => {
+            await widgetPage.checkWidgetIsNotVisible()
+        });
+    });
 })
