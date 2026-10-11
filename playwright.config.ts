@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import {defineConfig, devices} from '@playwright/test';
 
 /**
  * Read environment variables from file.
@@ -12,27 +12,29 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './tests',
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    baseURL: 'https://uchi.ru',
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    testDir: './tests',
+    /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+    reporter: 'html',
+    /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+    use: {
+        baseURL: 'https://uchi.ru',
+        /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+        trace: 'on-first-retry',
 
-    launchOptions: {
-      /* slow down test run */
-      //slowMo: 500,
+        launchOptions: {
+            /* slow down test run */
+            //slowMo: 500,
+        },
     },
-  },
 
-  /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
-
+    /* Configure projects for major browsers */
+    projects: [
+        {
+            name: 'chromium',
+            use: {
+                ...devices['Desktop Chrome'],
+                testIdAttribute: 'data-testid,data-test'
+            },
+        },
+    ],
 });
